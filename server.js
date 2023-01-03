@@ -14,18 +14,16 @@ process.on("uncaughtException", err => {
 
 const app = require("./app");
 const database = process.env.DATABASE;
-
-// Connect the database
 exports.mongoConnection = mongoose
   .connect(database, {
     useNewUrlParser: true,
-    useCreateIndex: true,
-    useFindAndModify: false
+    useUnifiedTopology: true
   })
   .then(con => {
     console.log("DB connection Successfully!");
     return con;
-  });
+  })
+  .catch(err => console.log(err));
 
 // Start the server
 const port = process.env.PORT;
