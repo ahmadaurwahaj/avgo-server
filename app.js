@@ -5,24 +5,13 @@ const mongoSanitize = require("express-mongo-sanitize");
 const xss = require("xss-clean");
 const hpp = require("hpp");
 const cors = require("cors");
+const globalErrHandler = require("./controllers/errorController");
+
 // const url = require('url');
 
 const userRoutes = require("./routes/userRoutes");
-const offerRoutes = require("./routes/offerRoutes");
 const chatRoutes = require("./routes/chatRoute");
-const ethereumRoutes = require("./routes/ethereumRoutes");
-const globalErrHandler = require("./controllers/errorController");
-const walletRoutes = require("./routes/walletRoutes");
-const paymentMethodRoutes = require("./routes/paymentMethodRoutes");
-const subPaymentMethodRoutes = require("./routes/subPaymentMethodRoutes");
-const feedbackRoutes = require("./routes/feedbackRoute");
-const transectionRoutes = require("./routes/transectionRoutes");
-const bankAccountRoutes = require("./routes/bankAccountRoutes");
-const securityQuesitonsRoutes = require("./routes/securityQuestionsRoutes");
 const notificationsRoutes = require("./routes/notificationsRoutes");
-const offerTagsRoutes = require("./routes/offerTagsRoutes");
-const usdtRoutes = require("./routes/usdtRoutes");
-const comissionRoutes = require("./routes/comission-routes");
 const AppError = require("./utils/appError");
 const app = express();
 
@@ -105,21 +94,8 @@ mongoose.Promise = global.Promise;
 mongoose.set("debug", true);
 // Routes
 app.use("/api/v1/users", userRoutes);
-app.use("/api/v1/offer", offerRoutes);
 app.use("/api/v1/chat", chatRoutes);
-app.use("/api/v1/payment", paymentMethodRoutes);
-app.use("/api/v1/eth", ethereumRoutes);
-app.use("/api/v1/wallet", walletRoutes);
-app.use("/api/v1/sub/payment", subPaymentMethodRoutes);
-app.use("/api/v1/feedback", feedbackRoutes);
-app.use("/api/v1/transection", transectionRoutes);
-app.use("/api/v1/bank_account", bankAccountRoutes);
-app.use("/api/v1/security_questions", securityQuesitonsRoutes);
 app.use("/api/v1/notifications", notificationsRoutes);
-
-app.use("/api/v1/offer_tags", offerTagsRoutes);
-app.use("/api/v1/usdt", usdtRoutes);
-app.use("/api/v1/comission", comissionRoutes);
 
 // handle undefined Routes
 app.use("*", (req, res, next) => {

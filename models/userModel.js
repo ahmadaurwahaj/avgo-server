@@ -116,73 +116,73 @@ const userSchema = new mongoose.Schema(
     },
     loginIp: {
       type: String,
-      default: ''
+      default: ""
     },
-    loginCountry:{
+    loginCountry: {
       type: String,
-      default: ''
+      default: ""
     },
-    loginCity:{
+    loginCity: {
       type: String,
-      default: ''
+      default: ""
     },
     loginBrowser: {
       type: String,
-      default: ''
+      default: ""
     },
-    updateIp:{
+    updateIp: {
       type: String,
-      default: ''
+      default: ""
     },
     updateCountry: {
       type: String,
-      default: ''
+      default: ""
     },
     updateCity: {
       type: String,
-      default: ''
+      default: ""
     },
-    updateBrowser:{
+    updateBrowser: {
       type: String,
-      default: ''
+      default: ""
     },
     updateUserTime: {
       type: Date
     },
-    kycIp:{
+    kycIp: {
       type: String,
-      default: ''
+      default: ""
     },
     kycCountry: {
       type: String,
-      default: ''
+      default: ""
     },
     kycCity: {
       type: String,
-      default: ''
+      default: ""
     },
-    kycBrowser:{
+    kycBrowser: {
       type: String,
-      default: ''
+      default: ""
     },
     kycUserTime: {
       type: Date
     },
-    reqIp:{
+    reqIp: {
       type: String,
-      default: ''
+      default: ""
     },
     reqCountry: {
       type: String,
-      default: ''
+      default: ""
     },
     reqCity: {
       type: String,
-      default: ''
+      default: ""
     },
-    reqBrowser:{
+    reqBrowser: {
       type: String,
-      default: ''
+      default: ""
     },
     reqTime: {
       type: Date
@@ -195,8 +195,6 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-// encrypt the password using 'bcryptjs'
-// Mongoose -> Document Middleware
 userSchema.pre("save", async function (next) {
   // check the password if it is modified
   if (!this.isModified("password")) {

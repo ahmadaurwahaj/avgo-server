@@ -1,8 +1,6 @@
 const AppError = require("../utils/appError");
 const APIFeatures = require("../utils/apiFeatures");
 const { User } = require("../models/userModel");
-const Wallet = require("../models/walletModel");
-const offer = require("../models/offerModel");
 const bcrypt = require("bcryptjs");
 
 const Model = User;
@@ -80,9 +78,7 @@ exports.getOne = () => async (req, res, next) => {
       _id: req.params.id,
       status: "active"
     }).lean();
-    const { wallet } = await Wallet.findOne({ user: doc._id }).select(
-      "wallet.public"
-    );
+
     if (!doc) {
       return next(
         new AppError(404, "fail", "No document found with that id"),
@@ -95,8 +91,7 @@ exports.getOne = () => async (req, res, next) => {
     res.status(200).json({
       status: "success",
       data: {
-        ...doc,
-        ethWallet: wallet.public
+        ...doc
       }
     });
   } catch (error) {
@@ -112,50 +107,6 @@ exports.getAll = () => async (req, res, next) => {
       status: "success",
       data: {
         data: users
-      }
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-exports.blockUser = () => async (req, res, next) => {
-  try {
-    await Model.findOneAndUpdate(
-      { _id: req.body.id },
-      { $set: { status: "block" } }
-    );
-    await offer.updateMany({ user: req.body.id }, { $set: { status: false } });
-    res.status(200).json({
-      status: "success",
-      message: "User has been blocked"
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-exports.unBlockUser = () => async (req, res, next) => {
-  try {
-    await Model.findOneAndUpdate(
-      { _id: req.body.id },
-      { $set: { status: "active" } }
-    );
-    await offer.updateMany({ user: req.body.id }, { $set: { status: true } });
-    res.status(200).json({
-      status: "success",
-      message: "User has been unblocked"
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-exports.blockList = () => async (req, res, next) => {
-  try {
-    const list = await Model.find({ status: "block" });
-    res.status(200).json({
-      status: "success",
-      data: {
-        data: list
       }
     });
   } catch (error) {

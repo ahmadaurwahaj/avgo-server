@@ -6,8 +6,6 @@ const transport = require("../utils/mail");
 const { User, schema } = require("../models/userModel");
 const AppError = require("../utils/appError");
 const { getOrSetCache } = require("../utils/redisConfig");
-const Wallet = require("../models/walletModel");
-const Web3EthAccounts = require("web3-eth-accounts");
 
 const createToken = (id, secretKey) => {
   return jwt.sign(
@@ -60,69 +58,6 @@ exports.login = async (req, res, next) => {
         runValidators: true
       }
     );
-    console.log("user", user);
-    const WalletExist = await Wallet.findOne({ user: user._id }).select(
-      "wallet.public"
-    );
-
-    console.log("wallet Exist:", WalletExist);
-    // ====== create new wallet  ========
-
-    if (!WalletExist) {
-      let ResponseCode = 200;
-      let ResponseMessage = ``;
-      let ResponseData = null;
-      try {
-        let account = new Web3EthAccounts(
-          "https://rinkeby.infura.io/v3/07b0f2fe4e234ceea0ff428f0d25326e"
-        );
-
-        let wallet = account.create();
-
-        let walletAddress = wallet.address;
-        // const count = await web3.eth.getTransactionCount(walletAddress);
-
-        let date = new Date();
-        let timestamp = date.getTime();
-
-        ResponseData = {
-          wallet: {
-            private: wallet.privateKey,
-            public: wallet.address,
-            currency: "ETH",
-            create_date: date,
-            sent: 0,
-            received: 0,
-            link: `https://www.etherscan.io/account/${walletAddress}`
-          },
-          message: "",
-          timestamp: timestamp,
-          status: 200,
-          success: true
-        };
-
-        const createWallet = await Wallet.create({
-          user: user._id,
-          wallet: { ...ResponseData.wallet }
-        });
-
-        console.log(createWallet);
-        // ResponseMessage = "Completed";
-        // ResponseCode = 200;
-        // res.status(200).json({
-        //   code: ResponseCode,
-        //   data: ResponseData,
-        //   msg: ResponseMessage
-        // });
-      } catch (error) {
-        console.log(error, "error");
-        ResponseMessage = `Transaction signing stops with the error ${error}`;
-        ResponseCode = 400;
-      }
-    }
-    // ===== end wallet =======
-
-    // 3) All correct, send jwt to client
     const token = createToken(user.id, process.env.JWT_SECRET);
 
     // Remove the password from the output
@@ -132,8 +67,7 @@ exports.login = async (req, res, next) => {
       status: "success",
       token,
       data: {
-        user,
-        wallet: { ethWallet: WalletExist?.wallet?.public ?? "" }
+        user
       }
     });
   } catch (err) {
@@ -155,16 +89,16 @@ exports.signup = async (req, res, next) => {
     const token = createToken(user.id, process.env.JWT_SECRET);
     user.password = undefined;
     ////////////////////////
-    const message = {
-      from: process.env.MAIL_AUTH_USER,
-      to: user.email,
-      subject: "P2P USER - Request Access",
-      // text: `Doctor ${doctorUser.data.first_name} ${doctorUser.data.last_name} requested for access.`,
-      html: `P2P ${user.name} requested for access. <br><br>
-    <a href="${process.env.FRONTEND_APP_PATH}/grant-access/${user._id}/accepted">Accept</a> &nbsp;&nbsp;&nbsp;&nbsp; <a href="${process.env.FRONTEND_APP_PATH}/grant-access/${user._id}/rejected">Reject</a>`
-    };
+    // const message = {
+    //   from: process.env.MAIL_AUTH_USER,
+    //   to: user.email,
+    //   subject: "P2P USER - Request Access",
+    //   // text: `Doctor ${doctorUser.data.first_name} ${doctorUser.data.last_name} requested for access.`,
+    //   html: `P2P ${user.name} requested for access. <br><br>
+    // <a href="${process.env.FRONTEND_APP_PATH}/grant-access/${user._id}/accepted">Accept</a> &nbsp;&nbsp;&nbsp;&nbsp; <a href="${process.env.FRONTEND_APP_PATH}/grant-access/${user._id}/rejected">Reject</a>`
+    // };
 
-    const data = await transport.sendMail(message);
+    // const data = await transport.sendMail(message);
     console.log("data: ", data);
     res.status(201).json({
       status: "success",
@@ -281,7 +215,17 @@ exports.updateForgetPassword = async (req, res, next) => {
     password = await bcrypt.hash(password, 12);
     const user = await User.findByIdAndUpdate(
       { _id: decode.id },
-      { $set: { password, changePass: new Date(), reqIp, reqCity, reqCountry, reqBrowser, reqTime } },
+      {
+        $set: {
+          password,
+          changePass: new Date(),
+          reqIp,
+          reqCity,
+          reqCountry,
+          reqBrowser,
+          reqTime
+        }
+      },
       { new: true }
     );
     if (user)
