@@ -17,9 +17,6 @@ router.post("/emailVerify", authController.trustUserEmail);
 
 router.use(middleware.protect);
 
-router.put("/add-favorites", userController.addFavorites);
-router.put("/remove-favorites", userController.removeFavorites);
-
 router
   .route("/:id")
   .get(userController.getUser)

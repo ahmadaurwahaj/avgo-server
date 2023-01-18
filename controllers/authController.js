@@ -247,6 +247,36 @@ exports.updateForgetPassword = async (req, res, next) => {
     });
   }
 };
+
+exports.updateUserData = async (req, res, next) => {
+  try {
+    console.log(req.params);
+    if (!req.params.id) next(new Error("User ID not found!"));
+    const doc = await User.findByIdAndUpdate(
+      req.params.id,
+      {
+        $set: { ...req.body }
+      },
+      {
+        new: true,
+        runValidators: true
+      }
+    );
+    if (!doc) {
+      res.send("error");
+    }
+
+    res.status(201).json({
+      status: "success",
+      message: "Password changed successfully",
+      data: {
+        doc
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 exports.resetPassword = async (req, res, next) => {
   try {
     let { email, currentPassword, newPassword } = req.body;
