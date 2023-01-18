@@ -13,18 +13,7 @@ const userSchema = new mongoose.Schema(
       unique: true,
       lowercase: true
     },
-    phoneNumber: {
-      type: String,
-      trim: true
-    },
-    currency: {
-      type: String,
-      trim: true
-    },
-    language: {
-      type: String,
-      trim: true
-    },
+
     bio: {
       type: String,
       trim: true
@@ -36,26 +25,11 @@ const userSchema = new mongoose.Schema(
       select: false
     },
 
-    role: {
-      type: String,
-      enum: ["admin", "buyer", "seller", "vendor"],
-      default: "buyer"
-    },
-    trusted: {
-      type: Boolean,
-      default: false
-    },
     status: {
       type: String,
       enum: ["active", "blocked"],
       default: "active"
     },
-    favorites: [
-      {
-        type: mongoose.Types.ObjectId,
-        ref: "Offer"
-      }
-    ],
     hasBlocked: [
       {
         type: mongoose.Types.ObjectId,
@@ -72,7 +46,7 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false
     },
-    profilePic: {
+    avatar: {
       type: String
     },
     loginTime: {
@@ -90,27 +64,7 @@ const userSchema = new mongoose.Schema(
     changePass: {
       type: Date
     },
-    enrolled: {
-      type: Boolean,
-      default: false
-    },
     verified: {
-      type: Boolean,
-      default: false
-    },
-    isEmailVerified: {
-      type: Boolean,
-      default: false
-    },
-    isPhoneVerified: {
-      type: Boolean,
-      default: false
-    },
-    isIdVerified: {
-      type: Boolean,
-      default: false
-    },
-    isAddressVerified: {
       type: Boolean,
       default: false
     },
@@ -134,58 +88,18 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: ""
     },
-    updateCountry: {
+    age: {
+      type: String,
+      required: false
+    },
+    gender: {
+      type: String,
+      enum: ["male", "female"],
+      default: "male"
+    },
+    country: {
       type: String,
       default: ""
-    },
-    updateCity: {
-      type: String,
-      default: ""
-    },
-    updateBrowser: {
-      type: String,
-      default: ""
-    },
-    updateUserTime: {
-      type: Date
-    },
-    kycIp: {
-      type: String,
-      default: ""
-    },
-    kycCountry: {
-      type: String,
-      default: ""
-    },
-    kycCity: {
-      type: String,
-      default: ""
-    },
-    kycBrowser: {
-      type: String,
-      default: ""
-    },
-    kycUserTime: {
-      type: Date
-    },
-    reqIp: {
-      type: String,
-      default: ""
-    },
-    reqCountry: {
-      type: String,
-      default: ""
-    },
-    reqCity: {
-      type: String,
-      default: ""
-    },
-    reqBrowser: {
-      type: String,
-      default: ""
-    },
-    reqTime: {
-      type: Date
     }
   },
   {
@@ -218,21 +132,10 @@ userSchema.methods.correctPassword = async function (
 //user's schema validation
 const schema = Joi.object({
   type: Joi.string().required().valid("EMAIL", "PHONE"),
-  email: Joi.string()
-    .email()
-    .when("type", {
-      is: "EMAIL",
-      then: Joi.required(),
-      otherwise: Joi.string().allow("")
-    }),
-  phoneNumber: Joi.string().when("type", {
-    is: "PHONE",
-    then: Joi.required(),
-    otherwise: Joi.string().allow("")
-  }),
+  email: Joi.string().email().required(),
+
   password: Joi.string().required().min(8),
-  name: Joi.string(),
-  role: Joi.string()
+  name: Joi.string()
 }).options({ allowUnknown: true });
 
 const User = mongoose.model("User", userSchema);

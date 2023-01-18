@@ -77,6 +77,7 @@ exports.login = async (req, res, next) => {
 
 exports.signup = async (req, res, next) => {
   try {
+    console.log(req.body);
     const inputs = req.body;
     const { error, value } = schema.validate({
       ...inputs,
@@ -99,7 +100,7 @@ exports.signup = async (req, res, next) => {
     // };
 
     // const data = await transport.sendMail(message);
-    console.log("data: ", data);
+
     res.status(201).json({
       status: "success",
       token,
