@@ -16,7 +16,7 @@ const AppError = require("./utils/appError");
 const app = express();
 
 const corsOptions = {
-  origin: ["http://localhost:3000", "https://p2p.invo.zone"],
+  origin: ["localhost:3001"],
   optionsSuccessStatus: 200, // For legacy browser support
   methods: "GET, PUT, POST, DELETE"
 };
@@ -25,6 +25,7 @@ app.use(cors(corsOptions));
 
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(express.json({ limit: "50mb" }));
+
 // const getOrigin = origin => {
 // 	if ( !origin ) {
 // 		return true;
