@@ -77,10 +77,18 @@ exports.login = async (req, res, next) => {
 
 exports.signup = async (req, res, next) => {
   try {
-    console.log(req.body);
-    const inputs = req.body;
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return next(
+        new AppError(404, "fail", "Please provide email or password"),
+        req,
+        res,
+        next
+      );
+    }
     const { error, value } = schema.validate({
-      ...inputs,
+      ...req.body,
       name: createUniqueUserName()
     });
     if (error) {
@@ -89,18 +97,6 @@ exports.signup = async (req, res, next) => {
     const user = await User.create(value);
     const token = createToken(user.id, process.env.JWT_SECRET);
     user.password = undefined;
-    ////////////////////////
-    // const message = {
-    //   from: process.env.MAIL_AUTH_USER,
-    //   to: user.email,
-    //   subject: "P2P USER - Request Access",
-    //   // text: `Doctor ${doctorUser.data.first_name} ${doctorUser.data.last_name} requested for access.`,
-    //   html: `P2P ${user.name} requested for access. <br><br>
-    // <a href="${process.env.FRONTEND_APP_PATH}/grant-access/${user._id}/accepted">Accept</a> &nbsp;&nbsp;&nbsp;&nbsp; <a href="${process.env.FRONTEND_APP_PATH}/grant-access/${user._id}/rejected">Reject</a>`
-    // };
-
-    // const data = await transport.sendMail(message);
-
     res.status(201).json({
       status: "success",
       token,

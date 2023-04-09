@@ -29,7 +29,20 @@ exports.deleteOne = () => async (req, res, next) => {
 
 exports.updateOne = () => async (req, res, next) => {
   try {
+    if (!req.body.type)
+      return next(
+        new AppError(404, "fail", "Please send type"),
+        req,
+        res,
+        next
+      );
     const values = { ...req.body };
+    if (values.type === "signup") {
+      const { bio, age, gender, country } = values;
+      if (!bio || !age || !gender || !country)
+        return new AppError(404, "fail", "Invalid Data", req, res, next);
+      values["signupCompleted"] = true;
+    }
     if (req.body.password) {
       values.password = await bcrypt.hash(req.body.password, 12);
     }

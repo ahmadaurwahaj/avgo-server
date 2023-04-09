@@ -69,6 +69,10 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false
     },
+    signupCompleted: {
+      type: Boolean,
+      default: true
+    },
     loginIp: {
       type: String,
       default: ""
