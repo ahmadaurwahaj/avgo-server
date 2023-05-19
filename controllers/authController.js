@@ -1,7 +1,6 @@
 const { promisify } = require("util");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const moment = require("moment");
 const transport = require("../utils/mail");
 const { User, schema } = require("../models/userModel");
 const AppError = require("../utils/appError");
@@ -89,7 +88,7 @@ exports.signup = async (req, res, next) => {
     }
     const { error, value } = schema.validate({
       ...req.body,
-      name: createUniqueUserName()
+      user_name: createUniqueUserName()
     });
     if (error) {
       return res.status(201).json(error);
@@ -118,48 +117,6 @@ exports.trustUserEmail = async (req, res, next) => {
       { $set: { isEmailVerified: true } },
       { new: true }
     );
-    console.log(doc);
-    return res.status(200).json({
-      status: "success",
-      data: {
-        doc
-      }
-    });
-  } catch (err) {
-    next(err);
-  }
-};
-exports.logout = async (req, res, next) => {
-  try {
-    let doc = await User.findByIdAndUpdate(
-      req.body._id,
-      {
-        $set: { isActive: false, lastSeenTime: new Date() }
-      },
-      {
-        new: true,
-        runValidators: true
-      }
-    );
-    const time = moment(doc.lastSeenTime).fromNow();
-    const loggedInTime = doc.loginTime;
-    const loggedOutTime = doc.lastSeenTime;
-    const d = Math.trunc((loggedOutTime - loggedInTime) / 1000);
-    var h = Math.floor(d / 3600);
-    var m = Math.floor((d % 3600) / 60);
-
-    var hDisplay = h > 0 && h < 24 ? h + (h == 1 ? " hour" : " hours") : "";
-    var mDisplay = m > 0 && h < 1 ? m + (m == 1 ? " min" : " mins") : "";
-    doc = await User.findByIdAndUpdate(
-      doc._id,
-      {
-        $set: { activeTime: hDisplay + mDisplay, lastSeen: time }
-      },
-      {
-        new: true,
-        runValidators: true
-      }
-    );
 
     return res.status(200).json({
       status: "success",
@@ -171,38 +128,39 @@ exports.logout = async (req, res, next) => {
     next(err);
   }
 };
-exports.sendPasswordForgetEmail = async (req, res, next) => {
-  try {
-    let { email } = req.body;
-    const user = await User.findOne({
-      email
-    });
-    if (!user)
-      return res.status(404).json({
-        status: "error",
-        message: "User does not exist!"
-      });
-    const token = createToken(user._id, process.env.RESET_JWT_KEY);
-    const message = {
-      from: process.env.MAIL_AUTH_USER,
-      to: user.email,
-      subject: "P2P USER - Password Reset",
-      // text: `Doctor ${doctorUser.data.first_name} ${doctorUser.data.last_name} requested for access.`,
-      html: `P2P ${user.name} requested for password reset. <br><br>
-    <a href="${process.env.FRONTEND_APP_PATH}/reset-password/${token}/accepted">Reset Password</a> &nbsp;&nbsp;&nbsp;&nbsp; `
-    };
 
-    const data = await transport.sendMail(message);
-    return res.status(200).json({
-      status: "success",
-      message: "Email Sent with reset instructions!"
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+// exports.sendPasswordForgetEmail = async (req, res, next) => {
+// try {
+//   let { email } = req.body;
+//   const user = await User.findOne({
+//     email
+//   });
+//   if (!user)
+//     return res.status(404).json({
+//       status: "error",
+//       message: "User does not exist!"
+//     });
+//   const token = createToken(user._id, process.env.RESET_JWT_KEY);
+//   const message = {
+//     from: process.env.MAIL_AUTH_USER,
+//     to: user.email,
+//     subject: "Avgo USER - Password Reset",
+//     // text: `Doctor ${doctorUser.data.first_name} ${doctorUser.data.last_name} requested for access.`,
+//     html: `Avgo ${user.name} requested for password reset. <br><br>
+//     <a href="${process.env.FRONTEND_APP_PATH}/reset-password/${token}/accepted">Reset Password</a> &nbsp;&nbsp;&nbsp;&nbsp; `
+//   };
+
+//   // const data = await transport.sendMail(message);
+//   return res.status(200).json({
+//     status: "success",
+//     message: "Email Sent with reset instructions!"
+//   });
+// } catch (error) {
+//   next(error);
+// }
+// };
+
 exports.updateForgetPassword = async (req, res, next) => {
-  let { reqIp, reqCity, reqCountry, reqBrowser, reqTime } = req.body;
   let { password, token } = req.body;
   try {
     const decode = await promisify(jwt.verify)(
@@ -214,13 +172,7 @@ exports.updateForgetPassword = async (req, res, next) => {
       { _id: decode.id },
       {
         $set: {
-          password,
-          changePass: new Date(),
-          reqIp,
-          reqCity,
-          reqCountry,
-          reqBrowser,
-          reqTime
+          password
         }
       },
       { new: true }

@@ -6,13 +6,12 @@ const middleware = require("../middlewares/auth");
 
 router.post("/login", authController.login);
 router.post("/signup", authController.signup);
-router.post("/resetPassword/:id", authController.resetPassword);
-router.post("/sendForgetEmail", authController.sendPasswordForgetEmail);
-router.post("/updateForgetPass", authController.updateForgetPassword);
+// router.post("/resetPassword/:id", authController.resetPassword);
+// router.post("/sendForgetEmail", authController.sendPasswordForgetEmail);
+// router.post("/updateForgetPass", authController.updateForgetPassword);
 router.route("/").get(userController.getAllUsers);
 
 // Protect all routes after this middleware
-router.post("/logout", authController.logout);
 router.post("/emailVerify", authController.trustUserEmail);
 
 router.use(middleware.protect);

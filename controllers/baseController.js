@@ -43,8 +43,9 @@ exports.updateOne = () => async (req, res, next) => {
         return new AppError(404, "fail", "Invalid Data", req, res, next);
       values["signupCompleted"] = true;
     }
-    if (req.body.password) {
-      values.password = await bcrypt.hash(req.body.password, 12);
+
+    if (req.body.password !== undefined) {
+      return next(new AppError(404, "fail", "Wrong request"), req, res, next);
     }
     const doc = await Model.findByIdAndUpdate(req.params.id, values, {
       new: true,

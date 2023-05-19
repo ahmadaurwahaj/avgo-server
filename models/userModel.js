@@ -4,7 +4,7 @@ const Joi = require("joi");
 
 const userSchema = new mongoose.Schema(
   {
-    name: {
+    user_name: {
       type: String
       // required: [true, "Please fill your name"],
     },
@@ -31,24 +31,19 @@ const userSchema = new mongoose.Schema(
       enum: ["active", "blocked"],
       default: "active"
     },
-    hasBlocked: [
-      {
-        type: mongoose.Types.ObjectId,
-        ref: "User"
-      }
-    ],
-    blockedBy: [
-      {
-        type: mongoose.Types.ObjectId,
-        ref: "User"
-      }
-    ],
+
+    isEmailVerified: {
+      type: Boolean,
+      default: false
+    },
     isActive: {
       type: Boolean,
       default: false
     },
-    avatar: {
-      type: String
+    avatar_id: {
+      type: mongoose.Types.ObjectId,
+      ref: "Avatar",
+      required: true
     },
     loginTime: {
       type: Date
@@ -56,42 +51,10 @@ const userSchema = new mongoose.Schema(
     lastSeenTime: {
       type: Date
     },
-    lastSeen: {
-      type: String
-    },
-    activeTime: {
-      type: String
-    },
-    changePass: {
-      type: Date
-    },
-    verified: {
-      type: Boolean,
-      default: false
-    },
+
     signupCompleted: {
       type: Boolean,
-      default: true
-    },
-    loginIp: {
-      type: String,
-      default: ""
-    },
-    loginCountry: {
-      type: String,
-      default: ""
-    },
-    loginCity: {
-      type: String,
-      default: ""
-    },
-    loginBrowser: {
-      type: String,
-      default: ""
-    },
-    updateIp: {
-      type: String,
-      default: ""
+      default: false
     },
     age: {
       type: String,

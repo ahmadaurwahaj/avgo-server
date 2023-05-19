@@ -11,6 +11,11 @@ const friendSchema = new mongoose.Schema(
       type: mongoose.Types.ObjectId,
       ref: "User",
       required: true
+    },
+    status: {
+      type: String,
+      enum: ["active", "blocked"],
+      default: "active"
     }
   },
   {
