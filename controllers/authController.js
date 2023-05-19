@@ -129,36 +129,36 @@ exports.trustUserEmail = async (req, res, next) => {
   }
 };
 
-// exports.sendPasswordForgetEmail = async (req, res, next) => {
-// try {
-//   let { email } = req.body;
-//   const user = await User.findOne({
-//     email
-//   });
-//   if (!user)
-//     return res.status(404).json({
-//       status: "error",
-//       message: "User does not exist!"
-//     });
-//   const token = createToken(user._id, process.env.RESET_JWT_KEY);
-//   const message = {
-//     from: process.env.MAIL_AUTH_USER,
-//     to: user.email,
-//     subject: "Avgo USER - Password Reset",
-//     // text: `Doctor ${doctorUser.data.first_name} ${doctorUser.data.last_name} requested for access.`,
-//     html: `Avgo ${user.name} requested for password reset. <br><br>
-//     <a href="${process.env.FRONTEND_APP_PATH}/reset-password/${token}/accepted">Reset Password</a> &nbsp;&nbsp;&nbsp;&nbsp; `
-//   };
+exports.sendPasswordForgetEmail = async (req, res, next) => {
+  try {
+    let { email } = req.body;
+    const user = await User.findOne({
+      email
+    });
+    if (!user)
+      return res.status(404).json({
+        status: "error",
+        message: "User does not exist!"
+      });
+    const token = createToken(user._id, process.env.RESET_JWT_KEY);
+    const message = {
+      from: process.env.MAIL_AUTH_USER,
+      to: user.email,
+      subject: "Avgo USER - Password Reset",
+      // text: `Doctor ${doctorUser.data.first_name} ${doctorUser.data.last_name} requested for access.`,
+      html: `Avgo ${user.name} requested for password reset. <br><br>
+    <a href="${process.env.FRONTEND_APP_PATH}/reset-password/${token}/accepted">Reset Password</a> &nbsp;&nbsp;&nbsp;&nbsp; `
+    };
 
-//   // const data = await transport.sendMail(message);
-//   return res.status(200).json({
-//     status: "success",
-//     message: "Email Sent with reset instructions!"
-//   });
-// } catch (error) {
-//   next(error);
-// }
-// };
+    const data = await transport.sendMail(message);
+    return res.status(200).json({
+      status: "success",
+      message: "Email Sent with reset instructions!"
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 exports.updateForgetPassword = async (req, res, next) => {
   let { password, token } = req.body;
@@ -196,35 +196,6 @@ exports.updateForgetPassword = async (req, res, next) => {
   }
 };
 
-exports.updateUserData = async (req, res, next) => {
-  try {
-    console.log(req.params);
-    if (!req.params.id) next(new Error("User ID not found!"));
-    const doc = await User.findByIdAndUpdate(
-      req.params.id,
-      {
-        $set: { ...req.body }
-      },
-      {
-        new: true,
-        runValidators: true
-      }
-    );
-    if (!doc) {
-      res.send("error");
-    }
-
-    res.status(201).json({
-      status: "success",
-      message: "Password changed successfully",
-      data: {
-        doc
-      }
-    });
-  } catch (error) {
-    next(error);
-  }
-};
 exports.resetPassword = async (req, res, next) => {
   try {
     let { email, currentPassword, newPassword } = req.body;
@@ -314,20 +285,6 @@ exports.protect = async (req, res, next) => {
 };
 
 // Authorization check if the user have rights to do this action
-exports.restrictTo = (...roles) => {
-  return (req, res, next) => {
-    if (!roles.includes(req.user.role)) {
-      console.log("#####roles", req?.user?.role, roles);
-      return next(
-        new AppError(403, "fail", "You are not allowed to do this action"),
-        req,
-        res,
-        next
-      );
-    }
-    next();
-  };
-};
 
 function createUniqueUserName() {
   return "_" + Math.random().toString(36).substr(2, 9);
