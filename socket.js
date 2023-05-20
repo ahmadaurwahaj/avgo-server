@@ -40,7 +40,6 @@ io.on("connection", async socket => {
   });
   //push the user to avilable users list
   availableUsers.push(socket);
-  console.log("AFTER PUSHING AVAILABLE USER:", availableUsers.length);
   let resolveAfter5Seconds = () => {
     return new Promise(resolve => {
       setTimeout(() => {
@@ -59,16 +58,6 @@ io.on("connection", async socket => {
     //remove the randomly selected user from the available users list
     availableUsers.splice(selected, 1);
 
-    // Make a user object and add it to the onlineUsers list and rooms too(maybe we can add to room once we have the partner.)
-
-    // create an unique id here.
-    // let uID = uniqueID();
-    // console.log(uID);
-    // rooms.push({ "roomID": uID, "isFilled": false });
-    // // Maintain a global room array which would store the room ids.
-    // socket.join(uID);
-    // // emit the room id to the frontend side.
-    // socket.emit('private ack', { "message": "Added to privateRoom", "roomID": uID });
     socket.emit("ack", { id: socket.id, msg: "User connected" });
     onlineUsers.push(socket);
 
@@ -148,31 +137,7 @@ io.on("connection", async socket => {
     }
   });
 });
-//};
 
-/*
-
-io.on("connection", async socket => {
-  // setInterval(() => server.emit("transaction-released", "Hi"), 5000);
-  // io.emit("transaction-released", "hi");
-  socket.on("send-chat-payload", async msg => {
-    serverFile.mongoConnection;
-    try {
-      const chat = await Chat.create({
-        message: msg.message,
-        sender: msg.senderID,
-        time: msg.time,
-        receiver: msg.receiverID,
-        transaction: msg.transactionId
-      });
-
-      return io.emit("receive-chat-message", [chat]);
-    } catch (error) {
-      console.log(error);
-    }
-  });
-});
-*/
 app.set("io", io);
 
 exports.module = server;

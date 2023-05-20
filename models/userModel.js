@@ -43,11 +43,9 @@ const userSchema = new mongoose.Schema(
     avatar_id: {
       type: mongoose.Types.ObjectId,
       ref: "Avatar",
-      required: true
+      required: false
     },
-    loginTime: {
-      type: Date
-    },
+
     lastSeenTime: {
       type: Date
     },
@@ -62,7 +60,7 @@ const userSchema = new mongoose.Schema(
     },
     gender: {
       type: String,
-      enum: ["male", "female"],
+      enum: ["male", "female", "other"],
       default: "male"
     },
     country: {
@@ -99,11 +97,10 @@ userSchema.methods.correctPassword = async function (
 };
 //user's schema validation
 const schema = Joi.object({
-  type: Joi.string().required().valid("EMAIL", "PHONE"),
   email: Joi.string().email().required(),
-
   password: Joi.string().required().min(8),
-  name: Joi.string()
+  bio: Joi.string().max(100),
+  user_name: Joi.string()
 }).options({ allowUnknown: true });
 
 const User = mongoose.model("User", userSchema);

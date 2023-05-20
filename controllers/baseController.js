@@ -1,5 +1,4 @@
 const AppError = require("../utils/appError");
-const APIFeatures = require("../utils/apiFeatures");
 const { User } = require("../models/userModel");
 const bcrypt = require("bcryptjs");
 
