@@ -16,11 +16,14 @@ const chatSchema = new mongoose.Schema(
       type: String,
       required: true
     },
-    file: {
-      type: String
+    // file: {
+    //   type: String
+    // },
+    send_at: {
+      type: Date
     },
-    time: {
-      type: String
+    seen_at: {
+      type: Date
     }
   },
   { timestamps: true }

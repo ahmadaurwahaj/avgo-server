@@ -4,7 +4,7 @@ const Joi = require("joi");
 
 const userSchema = new mongoose.Schema(
   {
-    name: {
+    user_name: {
       type: String
       // required: [true, "Please fill your name"],
     },
@@ -31,63 +31,28 @@ const userSchema = new mongoose.Schema(
       enum: ["active", "blocked"],
       default: "active"
     },
-    hasBlocked: [
-      {
-        type: mongoose.Types.ObjectId,
-        ref: "User"
-      }
-    ],
-    blockedBy: [
-      {
-        type: mongoose.Types.ObjectId,
-        ref: "User"
-      }
-    ],
+
+    isEmailVerified: {
+      type: Boolean,
+      default: false
+    },
     isActive: {
       type: Boolean,
       default: false
     },
-    avatar: {
-      type: String
+    avatar_id: {
+      type: mongoose.Types.ObjectId,
+      ref: "Avatar",
+      required: false
     },
-    loginTime: {
-      type: Date
-    },
+
     lastSeenTime: {
       type: Date
     },
-    lastSeen: {
-      type: String
-    },
-    activeTime: {
-      type: String
-    },
-    changePass: {
-      type: Date
-    },
-    verified: {
+
+    signupCompleted: {
       type: Boolean,
       default: false
-    },
-    loginIp: {
-      type: String,
-      default: ""
-    },
-    loginCountry: {
-      type: String,
-      default: ""
-    },
-    loginCity: {
-      type: String,
-      default: ""
-    },
-    loginBrowser: {
-      type: String,
-      default: ""
-    },
-    updateIp: {
-      type: String,
-      default: ""
     },
     age: {
       type: String,
@@ -95,7 +60,7 @@ const userSchema = new mongoose.Schema(
     },
     gender: {
       type: String,
-      enum: ["male", "female"],
+      enum: ["male", "female", "other"],
       default: "male"
     },
     country: {
@@ -132,11 +97,10 @@ userSchema.methods.correctPassword = async function (
 };
 //user's schema validation
 const schema = Joi.object({
-  type: Joi.string().required().valid("EMAIL", "PHONE"),
   email: Joi.string().email().required(),
-
   password: Joi.string().required().min(8),
-  name: Joi.string()
+  bio: Joi.string().max(100),
+  user_name: Joi.string()
 }).options({ allowUnknown: true });
 
 const User = mongoose.model("User", userSchema);
