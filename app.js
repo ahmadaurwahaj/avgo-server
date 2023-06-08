@@ -13,9 +13,9 @@ const AppError = require("./utils/appError");
 const app = express();
 
 const corsOptions = {
-  origin: ["localhost:3001"],
+  origin: ["http://localhost:5173"],
   optionsSuccessStatus: 200, // For legacy browser support
-  methods: "GET, PUT, POST, DELETE"
+  methods: "GET, PUT, POST, DELETE",
 };
 
 app.use(cors(corsOptions));
