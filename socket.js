@@ -36,7 +36,7 @@ io.on("connection", async socket => {
   let windowID = socket;
 
   socket.on("setUserData", userData => {
-    console.log(userData);
+    windowID.userData = userData;
     windowID.emit("wait", {
       message: "Please wait...connecting you to stranger!"
     });
@@ -142,9 +142,16 @@ io.on("connection", async socket => {
 
   // Disconnect the user
   socket.on("disconnect", () => {
+    console.log("User Disconnected");
     let index = onlineUsers.indexOf(socket);
     onlineUsers.splice(index, 1);
-    index = rooms.findIndex(x => x.roomID == windowID.roomID);
+    index = rooms.findIndex(
+      x =>
+        x.user1?.id === windowID?.userData?.id ||
+        x.user2?.id === windowID?.userData?.id
+    );
+    console.log("INDEX:", index);
+    console.log("windowsID:", windowID?.userData?.id);
     if (index >= 0) {
       if (rooms[index].isFilled == true) {
         let warning = {
