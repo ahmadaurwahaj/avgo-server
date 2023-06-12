@@ -45,9 +45,9 @@ io.on("connection", async socket => {
     const filteredUsers = availableUsers.filter(
       user => user.userData.id === userData?.id
     );
-    if (filteredUsers.length > 0) console.log("User Already exists");
-    //push the user to avilable users list
-    availableUsers.push({ socket: windowID, userData: userData });
+    if (filteredUsers.length === 0)
+      //push the user to avilable users list
+      availableUsers.push({ socket: windowID, userData: userData });
     let resolveAfter5Seconds = () => {
       return new Promise(resolve => {
         setTimeout(() => {
