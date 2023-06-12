@@ -15,7 +15,9 @@ const app = express();
 const corsOptions = {
   origin: ["http://localhost:5173"],
   optionsSuccessStatus: 200, // For legacy browser support
-  methods: "GET, PUT, POST, DELETE",
+  methods: "GET, PUT, POST, DELETE"
+  // allowedHeaders: ["Content-Type"],
+  // exposedHeaders: ["Content-Type"]
 };
 
 app.use(cors(corsOptions));
