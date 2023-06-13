@@ -34,7 +34,7 @@ let availableUsers = [];
 //module.exports = (io, app) => {
 io.on("connection", async socket => {
   let windowID = socket;
-
+  console.log("SOCKET:", socket.id);
   socket.on("setUserData", userData => {
     windowID.userData = userData;
     windowID.emit("wait", {
@@ -48,81 +48,83 @@ io.on("connection", async socket => {
     if (filteredUsers.length === 0)
       //push the user to avilable users list
       availableUsers.push({ socket: windowID, userData: userData });
-    let resolveAfter5Seconds = () => {
-      return new Promise(resolve => {
-        setTimeout(() => {
-          resolve("resolved");
-        }, 5000);
-      });
-    };
-    async function asyncCall() {
-      let result = await resolveAfter5Seconds();
-      //get index of randomly selected user from the available users list
-      console.log(availableUsers.length);
+    socket.on("peerInit", peer => {
+      let resolveAfter5Seconds = () => {
+        return new Promise(resolve => {
+          setTimeout(() => {
+            resolve("resolved");
+          }, 5000);
+        });
+      };
+      async function asyncCall() {
+        let result = await resolveAfter5Seconds();
+        //get index of randomly selected user from the available users list
+        // console.log(availableUsers.length);
 
-      let selected = Math.floor(Math.random() * availableUsers.length);
-      //store the user in Socket
-      console.log("SELECTED:", availableUsers[selected].userData);
-      socket = availableUsers[selected].socket;
+        // let selected = Math.floor(Math.random() * availableUsers.length);
+        // //store the user in Socket
+        // console.log("SELECTED:", availableUsers[selected].userData);
+        // socket = availableUsers[selected].socket;
 
-      //remove the randomly selected user from the available users list
-      availableUsers.splice(selected, 1);
+        //remove the randomly selected user from the available users list
+        // availableUsers.splice(selected, 1);
 
-      socket.emit("ack", {
-        id: socket.id,
-        userData: userData,
-        msg: "User connected"
-      });
-      onlineUsers.push(socket);
-
-      socket.on("privateRoom", user => {
-        let unfilledRooms = rooms.filter(room => {
-          if (!room.isFilled) {
-            return room;
+        socket.emit("ack", {
+          id: socket.id,
+          userData: userData,
+          msg: "User connected"
+        });
+        onlineUsers.push(socket);
+        console.log("ack is emitted", socket.id);
+        socket.on("privateRoom", user => {
+          let unfilledRooms = rooms.filter(room => {
+            if (!room.isFilled) {
+              return room;
+            }
+          });
+          try {
+            console.log(unfilledRooms[0]);
+            // join the existing room.
+            if (unfilledRooms[0].roomID === userData?.id) return;
+            socket.join(unfilledRooms[0].roomID);
+            let index = rooms.indexOf(unfilledRooms[0]);
+            rooms[index].isFilled = true;
+            rooms[index].user2 = userData;
+            unfilledRooms[0].isFilled = true;
+            socket.emit("private ack", {
+              message: "Added to privateRoom",
+              roomID: unfilledRooms[0].roomID
+            });
+            socket.roomID = unfilledRooms[0].roomID;
+            io.sockets.in(socket.roomID).emit("toast", {
+              message: "You are connected with a stranger!",
+              user1: unfilledRooms[0].user1,
+              user2: unfilledRooms[0].user2
+            });
+            socket.emit("init-call", { pId: unfilledRooms[0].peerId });
+          } catch (e) {
+            console.log("CREATED ROOM");
+            // dont have unfilled rooms. Thus creating a new user.
+            let uID = uniqueID();
+            console.log("PEERID:", peer.peerId);
+            rooms.push({
+              roomID: userData?.id,
+              user1: userData,
+              user2: null,
+              isFilled: false,
+              peerId: peer.peerId
+            });
+            socket.join(userData?.id);
+            socket.roomID = userData?.id;
+            socket.emit("private ack", {
+              message: "Added to privateRoom",
+              roomID: userData?.id
+            });
           }
         });
-        try {
-          console.log(unfilledRooms[0]);
-          // join the existing room.
-          if (unfilledRooms[0].roomID === userData?.id) return;
-          socket.join(unfilledRooms[0].roomID);
-          let index = rooms.indexOf(unfilledRooms[0]);
-          rooms[index].isFilled = true;
-          rooms[index].user2 = userData;
-          unfilledRooms[0].isFilled = true;
-          socket.emit("private ack", {
-            message: "Added to privateRoom",
-            roomID: unfilledRooms[0].roomID
-          });
-          socket.roomID = unfilledRooms[0].roomID;
-          io.sockets.in(socket.roomID).emit("toast", {
-            message: "You are connected with a stranger!",
-            user1: unfilledRooms[0].user1,
-            user2: unfilledRooms[0].user2
-          });
-          socket.emit("init-call", { pId: unfilledRooms[0].peerId });
-        } catch (e) {
-          console.log("CREATED ROOM");
-          // dont have unfilled rooms. Thus creating a new user.
-          let uID = uniqueID();
-          console.log("PEERID:", user.peerId);
-          rooms.push({
-            roomID: userData?.id,
-            user1: userData,
-            user2: null,
-            isFilled: false,
-            peerId: user.peerId
-          });
-          socket.join(userData?.id);
-          socket.roomID = userData?.id;
-          socket.emit("private ack", {
-            message: "Added to privateRoom",
-            roomID: userData?.id
-          });
-        }
-      });
-    }
-    asyncCall();
+      }
+      asyncCall();
+    });
   });
   socket.on("sendMessage", data => {
     let timeStamp = moment().format("LT");
