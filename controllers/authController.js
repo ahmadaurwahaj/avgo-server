@@ -61,7 +61,7 @@ exports.login = async (req, res, next) => {
 
     // Remove the password from the output
     user.password = undefined;
-    await getOrSetCache("userInfo", user);
+    // await getOrSetCache("userInfo", user);
     res.status(200).json({
       status: "success",
       token,
