@@ -8,6 +8,7 @@ const globalErrHandler = require("./controllers/errorController");
 
 const userRoutes = require("./routes/userRoutes");
 const chatRoutes = require("./routes/chatRoute");
+const friendRoutes = require("./routes/friendRoute");
 
 const AppError = require("./utils/appError");
 const app = express();
@@ -46,6 +47,7 @@ mongoose.set("debug", true);
 // Routes
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/chat", chatRoutes);
+app.use("/api/v1/friend", friendRoutes);
 
 // handle undefined Routes
 app.use("*", (req, res, next) => {
