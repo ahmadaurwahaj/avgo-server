@@ -4,14 +4,14 @@ const Chat = require("../models/chatModel");
 exports.getChat = async (req, res, next) => {
   console.log(req.params);
   Chat.find({
-    $or: [
-      { senderId: req.params.senderId },
-      { receiverId: req.params.receiverId }
-    ]
-  }).exec((err, chats) => {
-    if (err) return res.status(400).send(err);
-    res.status(200).send(chats);
-  });
+    $or: [{ sender: req.params.senderId }, { receiver: req.params.receiverId }]
+  })
+    .populate("sender", "user_name")
+    .populate("receiver", "user_name")
+    .exec((err, chats) => {
+      if (err) return res.status(400).send(err);
+      else res.status(200).send(chats);
+    });
 };
 
 exports.addChat = async (req, res, next) => {
