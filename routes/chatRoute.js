@@ -4,6 +4,6 @@ const chatController = require("../controllers/chatController");
 
 // /api/chat/getChats
 router.post("/addChat", chatController.addChat);
-router.get("/getChats/:senderId/:receiverId", chatController.getChat);
+router.get("/getChats/:friendId", chatController.getChat);
 
 module.exports = router;

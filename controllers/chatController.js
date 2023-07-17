@@ -3,9 +3,7 @@ const Chat = require("../models/chatModel");
 // Get chat data route
 exports.getChat = async (req, res, next) => {
   console.log(req.params);
-  Chat.find({
-    $or: [{ sender: req.params.senderId }, { receiver: req.params.receiverId }]
-  })
+  Chat.find({ friendId: req.params.friendId })
     .populate("sender", "user_name")
     .populate("receiver", "user_name")
     .exec((err, chats) => {
@@ -16,7 +14,7 @@ exports.getChat = async (req, res, next) => {
 
 exports.addChat = async (req, res, next) => {
   const value = req.body;
-  if (!value.sender || !value.receiver || !value.message) {
+  if (!value.sender || !value.receiver || !value.message || !value.friendId) {
     return next(new AppError(404, "fail", "Invalid Request"), req, res, next);
   }
   value.sendAt = new Date();
