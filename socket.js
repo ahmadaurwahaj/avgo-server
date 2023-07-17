@@ -102,6 +102,12 @@ io.on("connection", async socket => {
               user2: unfilledRooms[0].user2
             });
             socket.emit("init-call", { pId: unfilledRooms[0].peerId });
+            socket.on("sendRequest", user => {
+              socket.to(socket.roomID).emit("requestReceived");
+            });
+            socket.on("requestAccepted", user => {
+              io.sockets.in(socket.roomID).emit("friendAdded");
+            });
           } catch (e) {
             console.log("CREATED ROOM");
             // dont have unfilled rooms. Thus creating a new user.
